@@ -3,7 +3,6 @@ package com.example;
 import com.example.ResponseObjects.*;
 import com.example.service.ClientsRequest;
 import com.example.util.Data42;
-import com.example.util.Location;
 import com.example.util.NodeInfo;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,13 +19,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 @SpringBootApplication
 public class Main extends Application {
@@ -80,6 +76,7 @@ public class Main extends Application {
 	private TableColumn mediumTownColumn;
 	private TableColumn largeTownColumn;
 
+    ArrayList<Data42> newData = new ArrayList<Data42>();
 	private final ObservableList<Data42> data = FXCollections.observableArrayList();
 
 	@Override
@@ -155,7 +152,7 @@ public class Main extends Application {
 
 		tableview.setItems(data);
 		tableview.getColumns().addAll(universityColumn, nameColumn, locationColumn, fromColumn, valueColumn, comeFromColumn);
-//		toggleColumnVisibility(false, false, false, false, false, false);
+		toggleColumnVisibility(false, false, false, false, false, false);
 
 		VBox center = (VBox) scene.lookup("#table");
 		center.getChildren().addAll(tableview);
@@ -198,21 +195,20 @@ public class Main extends Application {
             }
         } else {
             sleep(1000);
+            timer = new Timer();
+            newData = new ArrayList<Data42>();
             switch (action) {
                 case 1: // allCountries
                 case 11: { // working/countries
-                    timer = new Timer();
                     timer.schedule(new FirstTask(), 0, 500);
                     break;
                 }
                 case 2: { // universities
-                    timer = new Timer();
                     timer.schedule(new SecondTask(), 0, 500);
                     break;
                 }
                 case 3: // fieldOfStudy
                 case 10: { // working/fieldOfStudies
-                    timer = new Timer();
                     timer.schedule(new ThirdTask(), 0, 500);
                     break;
                 }
@@ -223,27 +219,22 @@ public class Main extends Application {
                     break;
                 }
                 case 6: { // orginFrom/land
-                    timer = new Timer();
                     timer.schedule(new SixthTask(), 0, 500);
                     break;
                 }
                 case 7: { // orginFrom/countries
-                    timer = new Timer();
                     timer.schedule(new SeventhTask(), 0, 500);
                     break;
                 }
                 case 8: { // orginFrom/universities
-                    timer = new Timer();
                     timer.schedule(new EighthTask(), 0, 500);
                     break;
                 }
                 case 9: { // originFrom/fieldOfStudies todo jeszcze nie ma
-                    timer = new Timer();
                     timer.schedule(new NinthTask(), 0, 500);
                     break;
                 }
                 case 12: { // working/universities
-                    timer = new Timer();
                     timer.schedule(new TwelfthTask(), 0, 500);
                     break;
                 }
@@ -271,7 +262,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(false, false, true, false, true, false);
                     for(LocationResponse response : locationsList) {
                         newData.add(new Data42(
@@ -304,7 +294,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(true, false, false, false, false, false);
                     for(UniversityResponse response : universityList) {
                         newData.add(new Data42(
@@ -338,7 +327,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(false, true, false, false, true, false);
                     for(FieldOfStudyResponse response : studiesList) {
                         newData.add(new Data42(
@@ -372,7 +360,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(false, false, false, true, true, false);
                     for(ComeFromResponse response : comeFromList) {
                         newData.add(new Data42(
@@ -405,7 +392,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(false, false, true, false, false, true);
                     for(OriginFromCountriesResponse response : originFromCountriesList) {
                         newData.add(new Data42(
@@ -440,7 +426,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(true, false, false, false, false, true);
                     for(OriginFromUniversitiesResponse response : originFromUniversitiesList) {
                         newData.add(new Data42(
@@ -478,7 +463,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(false, true, false, false, false, true);
                     for(OriginFromStudiesResponse response : originFromStudiesList) {
                         newData.add(new Data42(
@@ -514,7 +498,6 @@ public class Main extends Application {
                 stopTask(true);
                 Platform.runLater(() -> {
                     data.clear();
-                    ArrayList<Data42> newData = new ArrayList<Data42>();
                     toggleColumnVisibility(true, false, false, false, true, false);
                     for(WorkingUniversitiesResponse response : workingUniversitiesList) {
                         newData.add(new Data42(
@@ -539,6 +522,7 @@ public class Main extends Application {
     }
 
     private void stopTask(boolean result) {
+        count = 0;
         timer.cancel();
         timer.purge();
         if(!result) {
@@ -557,274 +541,4 @@ public class Main extends Application {
     private void tryAnotherServersNode() {
         // todo tez cos
     }
-
-//    private void actionSwitcher(String url, int action) {
-//        jobs = null;
-//        jobs =  clientRequest.sendRequest(serverAddress + url);
-//        if(jobs == null) {
-//            jobs =  clientRequest.sendRequest(serverAddress + url);
-//            if(jobs == null) {
-//                showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem w trakcie połączenia z serwerem. Spróbuj ponownie.");
-//                return;
-//            }
-//        } else {
-//            sleep(1000);
-//            switch (action) {
-//                case 1: // allCountries
-//                case 11: { // working/countries
-//                    locationsList = null;
-//                    locationsList = clientRequest.doLocationJob(jobs.get(0).getJobUrl());
-//                    if (locationsList == null) {
-//                        locationsList = clientRequest.doLocationJob(jobs.get(1).getJobUrl());
-//                        if (locationsList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//                case 2: { // universities
-//                    universityList = null;
-//                    universityList = clientRequest.doUniversityJob(jobs.get(0).getJobUrl());
-//                    if (universityList == null) {
-//                        universityList = clientRequest.doUniversityJob(jobs.get(1).getJobUrl());
-//                        if (universityList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//                case 3: // fieldOfStudy
-//                case 10: { // working/fieldOfStudies
-//                    studiesList = null;
-//                    studiesList = clientRequest.doFieldOfStudyJob(jobs.get(0).getJobUrl());
-//                    if (studiesList == null) {
-//                        studiesList = clientRequest.doFieldOfStudyJob(jobs.get(1).getJobUrl());
-//                        if (studiesList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//                case 4: { // moreThanOneFieldOfStudy
-//                    break;
-//                }
-//                case 5: { // moreThanOneFieldOfStudy
-//                    break;
-//                }
-//                case 6: { // orginFrom/land
-//                    comeFromList = null;
-//                    comeFromList = clientRequest.doComeFromJob(jobs.get(0).getJobUrl());
-//                    if (comeFromList == null) {
-//                        comeFromList = clientRequest.doComeFromJob(jobs.get(1).getJobUrl());
-//                        if (comeFromList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//                case 7: { // orginFrom/countries
-//                    originFromCountriesList = null;
-//                    originFromCountriesList = clientRequest.doOriginFromCountriesJob(jobs.get(0).getJobUrl());
-//                    if (originFromCountriesList == null) {
-//                        originFromCountriesList = clientRequest.doOriginFromCountriesJob(jobs.get(1).getJobUrl());
-//                        if (originFromCountriesList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//                case 8: { // orginFrom/universities
-//                    originFromUniversitiesList = null;
-//                    originFromUniversitiesList = clientRequest.doOriginFromUniversitiesJob(jobs.get(0).getJobUrl());
-//                    if (originFromUniversitiesList == null) {
-//                        originFromUniversitiesList = clientRequest.doOriginFromUniversitiesJob(jobs.get(1).getJobUrl());
-//                        if (originFromUniversitiesList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//                case 9: { // orginFrom/fieldOfStudies
-//                    originFromStudiesList = null;
-//                    originFromStudiesList = clientRequest.doOriginFromStudiesJob(jobs.get(0).getJobUrl());
-//                    if (originFromStudiesList == null) {
-//                        originFromStudiesList = clientRequest.doOriginFromStudiesJob(jobs.get(1).getJobUrl());
-//                        if (originFromStudiesList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//                case 12: { // working/universities
-//                    workingUniversitiesList = null;
-//                    workingUniversitiesList = clientRequest.doWorkingUniversitiesJob(jobs.get(0).getJobUrl());
-//                    if (workingUniversitiesList == null) {
-//                        workingUniversitiesList = clientRequest.doWorkingUniversitiesJob(jobs.get(1).getJobUrl());
-//                        if (workingUniversitiesList == null) {
-//                            showAlert("Uwaga", "Problem z połączeniem", "Wystąpił problem z dostępnością danych. Spróbuj ponownie.");
-//                            return;
-//                        }
-//                    }
-//                    break;
-//                }
-//            }
-//        }
-//
-//        data.clear();
-//        ArrayList<Data42> newData = new ArrayList<Data42>();
-//
-//        switch (action) {
-//            case 1: { // allCountries
-//                toggleColumnVisibility(false, false, true, false, true, false);
-//                for(LocationResponse response : locationsList) {
-//                    newData.add(new Data42(
-//                            null, null, null, null, null,
-//                            response.getLocation().name(),
-//                            null,
-//                            response.getValue(),
-//                            0, 0, 0, 0));
-//                }
-//                break;
-//            }
-//            case 2: { // universities todo podobno poprawione
-//                toggleColumnVisibility(true, false, false, false, false, false);
-//                for(UniversityResponse response : universityList) {
-//                    newData.add(new Data42(
-//                            response.getName(),
-//                            response.getYerOfFundation(),
-//                            response.getUniversityType().toString(),
-//                            response.getLocation().toString(),
-//                            null, null, null,
-//                            0, 0, 0, 0, 0
-//                    ));
-//                }
-//                break;
-//            }
-//            case 3: { // fieldOfStudy
-//                toggleColumnVisibility(false, true, false, false, true, false);
-//                for(FieldOfStudyResponse response : studiesList) {
-//                    newData.add(new Data42(
-//                            null, null, null, null,
-//                            response.getName(),
-//                            null, null,
-//                            response.getVal(),
-//                            0, 0, 0, 0
-//                    ));
-//                }
-//                break;
-//            }
-//            case 4: { // moreThanOne todo nie ma i nie bedzie
-//                break;
-//            }
-//            case 5: { // moreThanOne
-//                break;
-//            }
-//            case 6: { // originFrom/land
-//                toggleColumnVisibility(false, false, false, true, true, false);
-//                for(ComeFromResponse response : comeFromList) {
-//                    newData.add(new Data42(
-//                            null, null, null, null, null, null,
-//                            response.getComeFrom().toString(),
-//                            response.getVal(),
-//                            0, 0, 0, 0
-//                    ));
-//                }
-//                break;
-//            }
-//            case 7: { // originFrom/countries
-//                toggleColumnVisibility(false, false, true, false, false, true);
-//                for(OriginFromCountriesResponse response : originFromCountriesList) {
-//                    newData.add(new Data42(
-//                            null, null, null, null, null,
-//                            response.getLocation().name(),
-//                            null, 0,
-//                            response.getComeFromDtos().get(0).getVal(),
-//                            response.getComeFromDtos().get(1).getVal(),
-//                            response.getComeFromDtos().get(2).getVal(),
-//                            response.getComeFromDtos().get(3).getVal()));
-//                }
-//                break;
-//            }
-//            case 8: { //originFrom/universities
-//                toggleColumnVisibility(true, false, false, false, false, true);
-//                for(OriginFromUniversitiesResponse response : originFromUniversitiesList) {
-//                    newData.add(new Data42(
-//                            response.getUniversityDto().getName(),
-//                            response.getUniversityDto().getYerOfFundation(),
-//                            response.getUniversityDto().getUniversityType().toString(),
-//                            response.getUniversityDto().getLocation().toString(),
-//                            null, null, null, 0,
-//                            response.getComeFromDtos().get(0).getVal(),
-//                            response.getComeFromDtos().get(1).getVal(),
-//                            response.getComeFromDtos().get(2).getVal(),
-//                            response.getComeFromDtos().get(3).getVal()
-//                    ));
-//                }
-//                break;
-//            }
-//            case 9: { // originFrom/fieldOfStudies todo jeszcze nie ma
-//                toggleColumnVisibility(false, true, false, false, false, true);
-//                for(OriginFromStudiesResponse response : originFromStudiesList) {
-//                    newData.add(new Data42(
-//                            null, null, null, null,
-//                            response.getFieldOfStudy().getName(),
-//                            null, null, 0,
-//                            response.getComeFromDtos().get(0).getVal(),
-//                            response.getComeFromDtos().get(1).getVal(),
-//                            response.getComeFromDtos().get(2).getVal(),
-//                            response.getComeFromDtos().get(3).getVal()
-//                    ));
-//                }
-//                break;
-//            }
-//            case 10: { // working/fieldOfStudy
-//                toggleColumnVisibility(false, true, false, false, true, false);
-//                for(FieldOfStudyResponse response : studiesList) {
-//                    newData.add(new Data42(
-//                            null, null, null, null,
-//                            response.getName(),
-//                            null, null,
-//                            response.getVal(),
-//                            0, 0, 0, 0
-//                    ));
-//                }
-//                break;
-//            }
-//            case 11: { // working/countries
-//                toggleColumnVisibility(false, false, true, false, true, false);
-//                for(LocationResponse response : locationsList) {
-//                    newData.add(new Data42(
-//                            null, null, null, null, null,
-//                            response.getLocation().name(),
-//                            null,
-//                            response.getValue(),
-//                            0, 0, 0, 0));
-//                }
-//                break;
-//            }
-//            case 12: { // working/universities
-//                toggleColumnVisibility(true, false, false, false, true, false);
-//                for(WorkingUniversitiesResponse response : workingUniversitiesList) {
-//                    newData.add(new Data42(
-//                            response.getUniversityDto().getName(),
-//                            response.getUniversityDto().getYerOfFundation(),
-//                            response.getUniversityDto().getUniversityType().toString(),
-//                            response.getUniversityDto().getLocation().toString(),
-//                            null, null, null,
-//                            response.getValue(),
-//                            0, 0, 0, 0
-//                    ));
-//                }
-//                break;
-//            }
-//        }
-//        data.addAll(newData);
-//    }
 }
