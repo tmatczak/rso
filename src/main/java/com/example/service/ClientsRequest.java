@@ -121,4 +121,13 @@ public class ClientsRequest {
             return null;
         }
     }
+
+    public NodesResponse doNodesResponse(String url){
+        try {
+            ResponseEntity<NodesResponse> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<NodesResponse>() {});
+            return response.getBody();
+        } catch (ResourceAccessException e) {
+            return null;
+        }
+    }
 }

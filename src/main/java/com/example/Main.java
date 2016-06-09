@@ -29,12 +29,15 @@ public class Main extends Application {
 
     private final static String PORT = "9000";
 
-    private String serverAddress = "http://127.0.0.1:9000/app";
-//    private String serverAddress = "http://192.168.1.3:9000/app";
-    private ArrayList<NodeInfo> servers = new ArrayList<>();
+//    private String serverAddress = "http://127.0.0.1:9000/app";
+    private String serverAddress = "http://192.168.1.2:9000/app";
+    private NodesResponse servers = new NodesResponse();
+    private NodeInfo coordinator = new NodeInfo();
+    private int interval = 1000;
 
     private Timer timer = new Timer();
     private static int count = 0;
+    private static int id = 0;
 
     private ClientsRequest clientRequest;
     private List<JobsResponse> jobs;
@@ -108,8 +111,8 @@ public class Main extends Application {
         button11 = (Button) scene.lookup("#eleventhButton");
         button12 = (Button) scene.lookup("#twelfthButton" );
 
-        button4.setDisable(true);
-        button5.setDisable(true);
+//        button4.setDisable(true);
+//        button5.setDisable(true);
         button9.setDisable(true);
 
 		button1.setOnAction(e -> actionSwitcher("/allCountries", 1));
@@ -183,6 +186,8 @@ public class Main extends Application {
     }
 
     private void actionSwitcher(String url, int action) {
+        getServersAddresses();
+        tryAnotherServersNode();
         timer.cancel();
         timer.purge();
         jobs = null;
@@ -199,43 +204,39 @@ public class Main extends Application {
             newData = new ArrayList<Data42>();
             switch (action) {
                 case 1: // allCountries
+                case 4: // // moreThanOneFieldOfStudy/country
                 case 11: { // working/countries
-                    timer.schedule(new FirstTask(), 0, 500);
+                    timer.schedule(new FirstTask(), 0, interval);
                     break;
                 }
                 case 2: { // universities
-                    timer.schedule(new SecondTask(), 0, 500);
+                    timer.schedule(new SecondTask(), 0, interval);
                     break;
                 }
                 case 3: // fieldOfStudy
                 case 10: { // working/fieldOfStudies
-                    timer.schedule(new ThirdTask(), 0, 500);
-                    break;
-                }
-                case 4: { // moreThanOneFieldOfStudy
-                    break;
-                }
-                case 5: { // moreThanOneFieldOfStudy
+                    timer.schedule(new ThirdTask(), 0, interval);
                     break;
                 }
                 case 6: { // orginFrom/land
-                    timer.schedule(new SixthTask(), 0, 500);
+                    timer.schedule(new SixthTask(), 0, interval);
                     break;
                 }
                 case 7: { // orginFrom/countries
-                    timer.schedule(new SeventhTask(), 0, 500);
+                    timer.schedule(new SeventhTask(), 0, interval);
                     break;
                 }
                 case 8: { // orginFrom/universities
-                    timer.schedule(new EighthTask(), 0, 500);
+                    timer.schedule(new EighthTask(), 0, interval);
                     break;
                 }
                 case 9: { // originFrom/fieldOfStudies todo jeszcze nie ma
-                    timer.schedule(new NinthTask(), 0, 500);
+                    timer.schedule(new NinthTask(), 0, interval);
                     break;
                 }
+                case 5: // moreThanOneFieldOfStudy/university
                 case 12: { // working/universities
-                    timer.schedule(new TwelfthTask(), 0, 500);
+                    timer.schedule(new TwelfthTask(), 0, interval);
                     break;
                 }
             }
@@ -535,10 +536,17 @@ public class Main extends Application {
     }
 
     private void getServersAddresses() {
-        // todo cos
+        servers = clientRequest.doNodesResponse("http://192.168.1.2:9000/utils/status");
+        coordinator = servers.getCoordinator();
     }
 
     private void tryAnotherServersNode() {
-        // todo tez cos
+        if(coordinator == null) {
+            if(servers.getExternalNodes() != null) {
+                setServer(servers.getExternalNodes().get(0).getNodeIPAddress());
+            }
+        } else {
+            setServer(servers.getCoordinator().getNodeIPAddress());
+        }
     }
 }
